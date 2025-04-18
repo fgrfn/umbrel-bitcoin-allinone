@@ -21,6 +21,9 @@ RUN npm install
 # Kopiere Start-Script
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+COPY scripts/start.sh /start.sh
+RUN chmod +x /start.sh
+
 
 # Exponierte Ports
 EXPOSE 3005
@@ -32,3 +35,4 @@ VOLUME ["/data", "/bitcoin"]
 
 # Setze EntryPoint
 ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/start.sh"]
