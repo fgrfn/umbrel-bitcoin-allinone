@@ -3,7 +3,7 @@ FROM node:20-bullseye AS umbrel-ui
 # 1. Baue Umbrel UI
 RUN git clone --recursive https://github.com/getumbrel/umbrel-bitcoin.git /umbrel
 WORKDIR /umbrel
-RUN npm install && npm run build
+RUN npm install
 
 # 2. Finaler Container mit Bitcoind + Umbrel
 FROM debian:bookworm-slim
