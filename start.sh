@@ -10,7 +10,7 @@ cat <<EOF > /bitcoin/.bitcoin/bitcoin.conf
 server=1
 rpcuser=$RPCUSER
 rpcpassword=$RPCPASSWORD
-rpcallowip=0.0.0.0
+rpcallowip=127.0.0.1
 txindex=1
 EOF
 
@@ -19,7 +19,7 @@ cat <<EOF > /bitcoin/.bitcoin/umbrel-bitcoin.conf
 server=1
 rpcuser=$RPCUSER
 rpcpassword=$RPCPASSWORD
-rpcallowip=0.0.0.0
+rpcallowip=127.0.0.1
 txindex=1
 EOF
 
