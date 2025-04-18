@@ -1,46 +1,34 @@
-# 1. Baue Umbrel-Bitcoin (Node App)
-FROM node:20-bullseye AS umbrel-ui
+# Basis-Image
+FROM node:18-bullseye
 
-# Hole den Quellcode
-RUN git clone --recursive https://github.com/getumbrel/umbrel-bitcoin.git /umbrel
+# Installiere bitcoind
+RUN apt-get update && \
+    apt-get install -y wget gnupg && \
+    wget https://bitcoin.org/bin/bitcoin-core-26.0/bitcoin-26.0-x86_64-linux-gnu.tar.gz && \
+    tar -xzf bitcoin-26.0-x86_64-linux-gnu.tar.gz && \
+    cp -r bitcoin-26.0/bin/* /usr/local/bin/ && \
+    rm -rf bitcoin-26.0*
+
+# Erstelle App-Verzeichnis
 WORKDIR /umbrel
+
+# Kopiere App-Dateien
+COPY umbrel/ /umbrel/
+
+# Installiere Abhängigkeiten
 RUN npm install
 
-# 2. Finales Image
-FROM debian:bookworm-slim
+# Kopiere Start-Script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-# Version definieren
-ENV BITCOIN_VERSION=27.0
-
-# System-Tools & Dependencies installieren
-RUN apt-get update && apt-get install -y \
-    curl gnupg ca-certificates wget unzip \
-    nodejs npm \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Arbeitsverzeichnis für Bitcoin-Daten
-WORKDIR /bitcoin
-
-# Bitcoind installieren
-RUN curl -O https://bitcoincore.org/bin/bitcoin-core-${BITCOIN_VERSION}/bitcoin-${BITCOIN_VERSION}-x86_64-linux-gnu.tar.gz && \
-    tar -xzf bitcoin-${BITCOIN_VERSION}-x86_64-linux-gnu.tar.gz && \
-    cp bitcoin-${BITCOIN_VERSION}/bin/* /usr/local/bin && \
-    rm -rf /bitcoin/*
-
-# Umbrel Bitcoin UI kopieren
-COPY --from=umbrel-ui /umbrel /umbrel
-
-# Start-Skript einfügen
-COPY start.sh /start.sh
-RUN chmod +x /start.sh
-
-# Mountpoint für Daten (Unraid Volume)
-VOLUME /bitcoin
-
-# Ports freigeben
-EXPOSE 8332
+# Exponierte Ports
+EXPOSE 3005
 EXPOSE 8333
-EXPOSE 3006
+EXPOSE 8332
 
-# Start-Kommando
-CMD ["/start.sh"]
+# Volumes
+VOLUME ["/data", "/bitcoin"]
+
+# Setze EntryPoint
+ENTRYPOINT ["/entrypoint.sh"]
