@@ -38,7 +38,9 @@ RUN chmod +x /start.sh
 VOLUME /bitcoin
 
 # Ports freigeben
-EXPOSE 8332 8333 3006
+EXPOSE 8332
+EXPOSE 8333
+EXPOSE 3006
 
 # Start-Kommando
 CMD ["/start.sh"]
