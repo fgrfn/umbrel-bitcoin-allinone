@@ -1,26 +1,34 @@
 #!/bin/bash
 
-# Fallback-Werte setzen, falls ENV nicht gesetzt ist
-: "${RPC_USER:=umbrel}"
-: "${RPC_PASSWORD:=umbrel}"
+# Set default values if not provided
+RPCUSER=${RPCUSER:-umbrel}
+RPCPASSWORD=${RPCPASSWORD:-umbrel}
 
-echo "⚙️  Generating bitcoin.conf from ENV..."
+# bitcoin.conf schreiben
 mkdir -p /bitcoin/.bitcoin
-
-cat > /bitcoin/.bitcoin/bitcoin.conf <<EOF
+cat <<EOF > /bitcoin/.bitcoin/bitcoin.conf
 server=1
-rpcbind=0.0.0.0
-rpcallowip=127.0.0.1
-rpcuser=${RPC_USER}
-rpcpassword=${RPC_PASSWORD}
+rpcuser=$RPCUSER
+rpcpassword=$RPCPASSWORD
+rpcallowip=0.0.0.0
+txindex=1
 EOF
 
-echo "✅ bitcoin.conf written:"
-cat /bitcoin/.bitcoin/bitcoin.conf
+# Umbrel Config mit gleichen Werten erzeugen
+cat <<EOF > /bitcoin/.bitcoin/umbrel-bitcoin.conf
+server=1
+rpcuser=$RPCUSER
+rpcpassword=$RPCPASSWORD
+rpcallowip=0.0.0.0
+txindex=1
+EOF
 
+echo "✅ Konfiguration geschrieben: bitcoin.conf & umbrel-bitcoin.conf"
+
+# Start Bitcoin
 echo "⛓️  Starting bitcoind..."
-bitcoind -datadir=/bitcoin -printtoconsole &
+bitcoind -datadir=/bitcoin/.bitcoin &
 
+# Start Umbrel UI
 echo "🌐 Starting Umbrel Bitcoin UI..."
-cd /umbrel
-npm start
+cd /umbrel && npm start
